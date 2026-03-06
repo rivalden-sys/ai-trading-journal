@@ -2,19 +2,6 @@
 
 import { useState, useEffect } from "react"
 import { supabase } from "@/lib/supabase"
-import {
-LineChart,
-Line,
-XAxis,
-YAxis,
-Tooltip,
-ResponsiveContainer,
-PieChart,
-Pie,
-Cell,
-BarChart,
-Bar
-} from "recharts"
 
 export default function TradesPage() {
 
@@ -22,132 +9,104 @@ const [symbol,setSymbol] = useState("")
 const [entry,setEntry] = useState("")
 const [exit,setExit] = useState("")
 const [qty,setQty] = useState("")
-const [message,setMessage] = useState("")
 
 const [trades,setTrades] = useState<any[]>([])
-const [chartData,setChartData] = useState<any[]>([])
-const [winLoss,setWinLoss] = useState<any[]>([])
-const [assetStats,setAssetStats] = useState<any[]>([])
+const [aiReview,setAiReview] = useState("")
+const [loading,setLoading] = useState(false)
 
 const [totalPnL,setTotalPnL] = useState(0)
 const [winRate,setWinRate] = useState(0)
 const [totalTrades,setTotalTrades] = useState(0)
 
-const [aiReview,setAiReview] = useState("")
-const [coach,setCoach] = useState("")
+useEffect(()=>{
+fetchTrades()
+},[])
 
-async function loadTrades(){
+async function fetchTrades(){
 
-const { data } = await supabase
+const {data} = await supabase
 .from("trades")
 .select("*")
-.order("created_at",{ascending:true})
+.order("created_at",{ascending:false})
 
 if(data){
 
-const clean = data.filter(t => t.symbol)
+const cleanTrades = data.filter(
+(t)=>t.symbol && t.entry > 0 && t.qty
+)
 
-setTrades(clean)
+setTrades(cleanTrades)
 
-let cumulative = 0
+calculateStats(cleanTrades)
 
-const curve = clean.map((t:any,i:number)=>{
+}
 
-cumulative += t.pnl || 0
+}
 
-return{
-trade:i+1,
-pnl:cumulative
+function calculateStats(trades:any[]){
+
+const total = trades.length
+setTotalTrades(total)
+
+let wins = 0
+let pnl = 0
+
+trades.forEach((t)=>{
+
+const tradePnL = (t.exit - t.entry) * t.qty
+pnl += tradePnL
+
+if(tradePnL > 0){
+wins++
 }
 
 })
 
-setChartData(curve)
+setTotalPnL(pnl)
 
-const wins = clean.filter((t:any)=>t.pnl > 0).length
-const losses = clean.filter((t:any)=>t.pnl <= 0).length
-
-setWinLoss([
-{ name:"Wins", value:wins },
-{ name:"Losses", value:losses }
-])
-
-const pnlSum = clean.reduce((sum:any,t:any)=>sum + (t.pnl || 0),0)
-
-setTotalPnL(Number(pnlSum.toFixed(2)))
-setTotalTrades(clean.length)
-
-if(clean.length > 0){
-setWinRate(Math.round((wins/clean.length)*100))
-}
-
-const assets:any = {}
-
-clean.forEach((t:any)=>{
-
-if(!assets[t.symbol]){
-assets[t.symbol] = 0
-}
-
-assets[t.symbol] += t.pnl
-
-})
-
-const assetArray = Object.keys(assets).map((symbol)=>({
-
-symbol,
-pnl:Number(assets[symbol].toFixed(2))
-
-}))
-
-setAssetStats(assetArray)
-
+if(total > 0){
+setWinRate(Math.round((wins/total)*100))
 }
 
 }
 
-async function addTrade(){
+async function saveTrade(){
 
-if(!symbol || !entry || !exit || !qty){
-setMessage("Fill all fields")
-return
-}
+if(!symbol || !entry || !qty) return
 
-const pnl =
-(Number(exit) - Number(entry)) * Number(qty)
-
-const { error } = await supabase
-.from("trades")
-.insert([
+await supabase.from("trades").insert([
 {
-symbol:symbol.toUpperCase(),
+symbol,
 entry:Number(entry),
 exit:Number(exit),
-qty:Number(qty),
-pnl:pnl
+qty:Number(qty)
 }
 ])
-
-if(error){
-
-setMessage("Error: "+error.message)
-
-}else{
-
-setMessage("Trade added ✅")
 
 setSymbol("")
 setEntry("")
 setExit("")
 setQty("")
 
-loadTrades()
+fetchTrades()
 
 }
+
+async function deleteTrade(id:string){
+
+await supabase
+.from("trades")
+.delete()
+.eq("id",id)
+
+fetchTrades()
 
 }
 
 async function analyzeTrade(trade:any){
+
+setLoading(true)
+setAiReview("")
 
 const res = await fetch("/api/ai-review",{
 
@@ -157,7 +116,9 @@ headers:{
 "Content-Type":"application/json"
 },
 
-body:JSON.stringify({trade})
+body:JSON.stringify({
+trade
+})
 
 })
 
@@ -165,191 +126,60 @@ const data = await res.json()
 
 setAiReview(data.review)
 
-}
-
-async function analyzeAllTrades(){
-
-const res = await fetch("/api/ai-coach",{
-
-method:"POST",
-
-headers:{
-"Content-Type":"application/json"
-},
-
-body:JSON.stringify({trades})
-
-})
-
-const data = await res.json()
-
-setCoach(data.review)
+setLoading(false)
 
 }
 
-useEffect(()=>{
-loadTrades()
-},[])
+return(
 
-const COLORS = ["#22c55e","#ef4444"]
-
-return (
-
-<div style={{
-maxWidth:1100,
-margin:"auto",
-padding:40,
-fontFamily:"Arial"
-}}>
+<div style={{padding:40,fontFamily:"sans-serif"}}>
 
 <h1>AI Trading Journal</h1>
 
-<div style={{
-display:"flex",
-gap:20,
-marginBottom:40
-}}>
-
-<div style={{flex:1,padding:20,background:"#111",borderRadius:12}}>
-<p>Total Trades</p>
-<h2>{totalTrades}</h2>
-</div>
-
-<div style={{flex:1,padding:20,background:"#111",borderRadius:12}}>
-<p>Win Rate</p>
-<h2>{winRate}%</h2>
-</div>
-
-<div style={{flex:1,padding:20,background:"#111",borderRadius:12}}>
-<p>Total PnL</p>
-<h2>{totalPnL}</h2>
-</div>
-
-</div>
-
-<h2>Profit Curve</h2>
-
-<div style={{
-height:250,
-background:"#111",
-padding:20,
-borderRadius:12,
-marginBottom:40
-}}>
-
-<ResponsiveContainer width="100%" height="100%">
-
-<LineChart data={chartData}>
-
-<XAxis dataKey="trade"/>
-<YAxis/>
-<Tooltip/>
-
-<Line
-type="monotone"
-dataKey="pnl"
-stroke="#22c55e"
-strokeWidth={3}
-/>
-
-</LineChart>
-
-</ResponsiveContainer>
-
-</div>
-
-<h2>Win / Loss</h2>
-
-<div style={{
-height:250,
-background:"#111",
-padding:20,
-borderRadius:12,
-marginBottom:40
-}}>
-
-<ResponsiveContainer width="100%" height="100%">
-
-<PieChart>
-
-<Pie
-data={winLoss}
-dataKey="value"
-cx="50%"
-cy="50%"
-outerRadius={80}
-label
->
-
-{winLoss.map((entry,index)=>(
-<Cell key={index} fill={COLORS[index % COLORS.length]} />
-))}
-
-</Pie>
-
-<Tooltip/>
-
-</PieChart>
-
-</ResponsiveContainer>
-
-</div>
-
-<h2>PnL by Asset</h2>
-
-<div style={{
-height:250,
-background:"#111",
-padding:20,
-borderRadius:12,
-marginBottom:40
-}}>
-
-<ResponsiveContainer width="100%" height="100%">
-
-<BarChart data={assetStats}>
-
-<XAxis dataKey="symbol"/>
-<YAxis/>
-<Tooltip/>
-
-<Bar dataKey="pnl" fill="#22c55e"/>
-
-</BarChart>
-
-</ResponsiveContainer>
-
-</div>
-
 <h2>Add Trade</h2>
 
-<input placeholder="Symbol" value={symbol} onChange={(e)=>setSymbol(e.target.value)}/>
+<input
+placeholder="Symbol"
+value={symbol}
+onChange={(e)=>setSymbol(e.target.value)}
+/>
+
+<input
+placeholder="Entry price"
+value={entry}
+onChange={(e)=>setEntry(e.target.value)}
+/>
+
+<input
+placeholder="Exit price"
+value={exit}
+onChange={(e)=>setExit(e.target.value)}
+/>
+
+<input
+placeholder="Quantity"
+value={qty}
+onChange={(e)=>setQty(e.target.value)}
+/>
+
 <br/><br/>
 
-<input placeholder="Entry price" value={entry} onChange={(e)=>setEntry(e.target.value)}/>
-<br/><br/>
+<button onClick={saveTrade}>
+Save Trade
+</button>
 
-<input placeholder="Exit price" value={exit} onChange={(e)=>setExit(e.target.value)}/>
-<br/><br/>
+<h2>Statistics</h2>
 
-<input placeholder="Quantity" value={qty} onChange={(e)=>setQty(e.target.value)}/>
-<br/><br/>
-
-<button onClick={addTrade}>Save Trade</button>
-
-<p>{message}</p>
-
-<br/><br/>
-
-<button onClick={analyzeAllTrades}>Analyze My Trading</button>
-
-<br/><br/>
+<p>Total Trades: {totalTrades}</p>
+<p>Win Rate: {winRate}%</p>
+<p>Total PnL: {totalPnL}</p>
 
 <h2>Trades History</h2>
 
-<table>
+<table border={1} cellPadding={10}>
 
 <thead>
+
 <tr>
 <th>Symbol</th>
 <th>Entry</th>
@@ -357,12 +187,18 @@ marginBottom:40
 <th>Qty</th>
 <th>PnL</th>
 <th>AI</th>
+<th>Delete</th>
 </tr>
+
 </thead>
 
 <tbody>
 
-{trades.map((trade)=>(
+{trades.map((trade)=>{
+
+const pnl = (trade.exit - trade.entry) * trade.qty
+
+return(
 
 <tr key={trade.id}>
 
@@ -370,41 +206,56 @@ marginBottom:40
 <td>{trade.entry}</td>
 <td>{trade.exit}</td>
 <td>{trade.qty}</td>
+<td>{pnl}</td>
 
-<td style={{color: trade.pnl > 0 ? "#22c55e" : "#ef4444"}}>
-{Number(trade.pnl).toFixed(2)}
+<td>
+
+<button
+onClick={()=>analyzeTrade(trade)}
+disabled={loading}
+>
+
+{loading ? "Analyzing..." : "Analyze"}
+
+</button>
+
 </td>
 
 <td>
-<button onClick={()=>analyzeTrade(trade)}>
-Analyze
+
+<button
+onClick={()=>deleteTrade(trade.id)}
+style={{color:"red"}}
+>
+
+Delete
+
 </button>
+
 </td>
 
 </tr>
 
-))}
+)
+
+})}
 
 </tbody>
 
 </table>
 
-<br/><br/>
+<h2>AI Trade Review</h2>
 
-<div style={{background:"#111",padding:20,borderRadius:12}}>
-<h3>AI Trade Review</h3>
-<pre style={{whiteSpace:"pre-wrap",lineHeight:"1.6"}}>
+<div style={{
+background:"#f5f5f5",
+padding:20,
+marginTop:10,
+borderRadius:10,
+maxWidth:600
+}}>
+
 {aiReview}
-</pre>
-</div>
 
-<br/><br/>
-
-<div style={{background:"#111",padding:20,borderRadius:12}}>
-<h3>AI Trading Coach</h3>
-<pre style={{whiteSpace:"pre-wrap",lineHeight:"1.6"}}>
-{coach}
-</pre>
 </div>
 
 </div>
