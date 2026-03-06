@@ -19,7 +19,9 @@ const [winRate,setWinRate] = useState(0)
 const [totalTrades,setTotalTrades] = useState(0)
 
 useEffect(()=>{
+
 fetchTrades()
+
 },[])
 
 async function fetchTrades(){
@@ -227,9 +229,7 @@ disabled={loading}
 onClick={()=>deleteTrade(trade.id)}
 style={{color:"red"}}
 >
-
 Delete
-
 </button>
 
 </td>
