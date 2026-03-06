@@ -94,10 +94,6 @@ fetchTrades()
 
 async function deleteTrade(id:string){
 
-const confirmDelete = confirm("Delete this trade?")
-
-if(!confirmDelete) return
-
 await supabase
 .from("trades")
 .delete()
@@ -191,7 +187,7 @@ Save Trade
 <th>Qty</th>
 <th>PnL</th>
 <th>AI</th>
-<th>Delete</th>
+<th></th>
 </tr>
 
 </thead>
@@ -229,13 +225,7 @@ disabled={loading}
 
 <button
 onClick={()=>deleteTrade(trade.id)}
-style={{
-color:"white",
-background:"red",
-border:"none",
-padding:"5px 10px",
-cursor:"pointer"
-}}
+style={{color:"red"}}
 >
 
 Delete
