@@ -335,7 +335,23 @@ export default function TradesPage() {
     setLoadingCoach(false)
   }
 
-  useEffect(() => { loadTrades() }, [])
+  useEffect(()=>{
+
+checkUser()
+
+},[])
+
+async function checkUser(){
+
+const { data } = await supabase.auth.getUser()
+
+if(!data.user){
+window.location.href="/login"
+}else{
+loadTrades()
+}
+
+}
 
   const pnlColor = totalPnL >= 0 ? "#30d158" : "#ff453a"
   const pnlFormatted = `${totalPnL >= 0 ? "+" : ""}$${Math.abs(totalPnL).toLocaleString()}`
@@ -627,3 +643,4 @@ export default function TradesPage() {
     </div>
   )
 }
+
