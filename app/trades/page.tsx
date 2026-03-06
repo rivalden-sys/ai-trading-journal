@@ -187,7 +187,7 @@ Save Trade
 <th>Qty</th>
 <th>PnL</th>
 <th>AI</th>
-<th></th>
+<th>Delete</th>
 </tr>
 
 </thead>
