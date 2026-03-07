@@ -458,8 +458,8 @@ export default function TradesPage() {
         {/* ── AI Panels ── */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 28 }}>
           {[
-            { title: "AI Trade Review", content: aiReview, empty: "Click "Analyze ✦" on any trade to get a per-trade breakdown." },
-            { title: "AI Trading Coach", content: coach, empty: "Click "✦ Analyze All" in the header to get coaching on your full journal." },
+            { title: "AI Trade Review", content: aiReview, empty: 'Click "Analyze ✦" on any trade to get a per-trade breakdown.' },
+            { title: "AI Trading Coach", content: coach, empty: 'Click "✦ Analyze All" in the header to get coaching on your full journal.' },
           ].map(panel => (
             <div key={panel.title} style={s.card}>
               <div style={{ ...s.sectionTitle, display: "flex", alignItems: "center", gap: 8 }}>
@@ -492,3 +492,4 @@ export default function TradesPage() {
     </div>
   )
 }
+
