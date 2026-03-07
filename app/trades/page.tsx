@@ -7,7 +7,6 @@ import {
   PieChart, Pie, Cell, BarChart, Bar,
 } from "recharts"
 
-// ─── Dark mode hook ───────────────────────────────────────────────────────────
 function useDarkMode() {
   const [dark, setDark] = useState(false)
   const [ready, setReady] = useState(false)
@@ -25,56 +24,66 @@ function useDarkMode() {
   return { dark, toggle, ready }
 }
 
-// ─── Theme ────────────────────────────────────────────────────────────────────
 function theme(dark: boolean) {
   return {
-    bg:        dark ? "#0a0a0b"   : "#f2f2f7",
-    surface:   dark ? "#1c1c1e"   : "#ffffff",
-    surface2:  dark ? "#2c2c2e"   : "#f2f2f7",
-    border:    dark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)",
+    bg:          dark ? "#0a0a0b" : "#f2f2f7",
+    surface:     dark ? "#1c1c1e" : "#ffffff",
+    surface2:    dark ? "#2c2c2e" : "#f2f2f7",
+    border:      dark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)",
     borderInput: dark ? "rgba(255,255,255,0.12)" : "#e5e5ea",
-    text:      dark ? "#f5f5f7"   : "#1c1c1e",
-    textSub:   dark ? "#8e8e93"   : "#8e8e93",
-    textMuted: dark ? "#48484a"   : "#c7c7cc",
-    inputBg:   dark ? "#2c2c2e"   : "#fafafa",
-    shadow:    dark ? "0 1px 3px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.06)"
-                    : "0 1px 3px rgba(0,0,0,0.07), 0 0 0 1px rgba(0,0,0,0.05)",
-    chartGrid: dark ? "#2c2c2e"   : "#f2f2f7",
-    tooltipBg: dark ? "#1c1c1e"   : "#ffffff",
+    text:        dark ? "#f5f5f7" : "#1c1c1e",
+    textSub:     dark ? "#8e8e93" : "#8e8e93",
+    textMuted:   dark ? "#48484a" : "#c7c7cc",
+    inputBg:     dark ? "#2c2c2e" : "#fafafa",
+    shadow:      dark
+      ? "0 1px 3px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.06)"
+      : "0 1px 3px rgba(0,0,0,0.07), 0 0 0 1px rgba(0,0,0,0.05)",
+    tooltipBg:   dark ? "#1c1c1e" : "#ffffff",
   }
 }
 
 const FONT = "-apple-system, 'SF Pro Display', BlinkMacSystemFont, 'Segoe UI', sans-serif"
 
-// ─── Shared styles ────────────────────────────────────────────────────────────
 function makeStyles(t: ReturnType<typeof theme>) {
   return {
     card: {
-      background: t.surface, borderRadius: 18,
+      background: t.surface,
+      borderRadius: 18,
       padding: "22px 24px",
       boxShadow: t.shadow,
       border: `1px solid ${t.border}`,
     } as React.CSSProperties,
     input: {
-      width: "100%", padding: "10px 14px",
-      border: `1px solid ${t.borderInput}`, borderRadius: 10,
-      fontSize: 14, outline: "none",
-      background: t.inputBg, fontFamily: FONT,
-      color: t.text, boxSizing: "border-box" as const,
+      width: "100%",
+      padding: "10px 14px",
+      border: `1px solid ${t.borderInput}`,
+      borderRadius: 10,
+      fontSize: 14,
+      outline: "none",
+      background: t.inputBg,
+      fontFamily: FONT,
+      color: t.text,
+      boxSizing: "border-box" as const,
     } as React.CSSProperties,
     label: {
-      fontSize: 12, fontWeight: 600, color: t.textSub,
-      letterSpacing: "0.04em", textTransform: "uppercase" as const,
-      marginBottom: 6, display: "block",
+      fontSize: 12,
+      fontWeight: 600,
+      color: t.textSub,
+      letterSpacing: "0.04em",
+      textTransform: "uppercase" as const,
+      marginBottom: 6,
+      display: "block",
     } as React.CSSProperties,
     sectionTitle: {
-      fontSize: 15, fontWeight: 600, color: t.text,
-      letterSpacing: "-0.02em", margin: "0 0 20px",
+      fontSize: 15,
+      fontWeight: 600,
+      color: t.text,
+      letterSpacing: "-0.02em",
+      margin: "0 0 20px",
     } as React.CSSProperties,
   }
 }
 
-// ─── Custom Tooltip ───────────────────────────────────────────────────────────
 function ChartTooltip({ active, payload, dark }: any) {
   const t = theme(dark)
   if (!active || !payload?.length) return null
@@ -88,72 +97,100 @@ function ChartTooltip({ active, payload, dark }: any) {
   )
 }
 
-// ─── Icon Button ──────────────────────────────────────────────────────────────
 function IconBtn({ icon, color, onClick, title }: { icon: string; color: string; onClick: () => void; title: string }) {
   const [hover, setHover] = useState(false)
   return (
-    <button onClick={onClick} title={title}
-      onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}
+    <button
+      onClick={onClick}
+      title={title}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
       style={{
         width: 28, height: 28, borderRadius: 7, border: "none", cursor: "pointer",
         background: hover ? `${color}18` : "transparent",
         color: hover ? color : "#8e8e93",
         fontSize: 13, fontFamily: FONT, transition: "all 0.15s",
         display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
-      }}>{icon}</button>
+      }}
+    >
+      {icon}
+    </button>
   )
 }
 
-// ─── Edit Modal ───────────────────────────────────────────────────────────────
-function EditModal({ trade, onSave, onClose, dark }: { trade: any; onSave: (id: string, f: any) => void; onClose: () => void; dark: boolean }) {
+function EditModal({ trade, onSave, onClose, dark }: {
+  trade: any; onSave: (id: string, f: any) => void; onClose: () => void; dark: boolean
+}) {
   const t = theme(dark)
   const s = makeStyles(t)
   const [sym, setSym] = useState(trade.symbol)
-  const [entry, setEntry] = useState(String(trade.entry))
-  const [exit, setExit] = useState(String(trade.exit ?? ""))
-  const [qty, setQty] = useState(String(trade.qty))
-  const preview = exit ? ((Number(exit) - Number(entry)) * Number(qty)).toFixed(2) : "—"
+  const [entryVal, setEntryVal] = useState(String(trade.entry))
+  const [exitVal, setExitVal] = useState(String(trade.exit ?? ""))
+  const [qtyVal, setQtyVal] = useState(String(trade.qty))
+  const preview = exitVal ? ((Number(exitVal) - Number(entryVal)) * Number(qtyVal)).toFixed(2) : ""
   const previewColor = Number(preview) >= 0 ? "#30d158" : "#ff453a"
+
   return (
     <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 200 }}>
       <div style={{ ...s.card, width: 420, padding: 28 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 22 }}>
           <div style={{ fontSize: 17, fontWeight: 700, color: t.text, letterSpacing: "-0.03em" }}>Edit Trade</div>
-          <button onClick={onClose} style={{ background: "none", border: "none", fontSize: 18, color: t.textSub, cursor: "pointer" }}>✕</button>
+          <button onClick={onClose} style={{ background: "none", border: "none", fontSize: 18, color: t.textSub, cursor: "pointer" }}>x</button>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 14 }}>
-          {[["Symbol", sym, setSym, "text", "AAPL"], ["Qty", qty, setQty, "number", "100"], ["Entry", entry, setEntry, "number", "0.00"], ["Exit", exit, setExit, "number", "0.00"]].map(([lbl, val, set, type, ph]) => (
-            <div key={lbl as string}>
-              <label style={s.label}>{lbl as string}</label>
-              <input type={type as string} placeholder={ph as string} value={val as string} onChange={e => (set as any)(e.target.value)} style={s.input} />
-            </div>
-          ))}
+          <div>
+            <label style={s.label}>Symbol</label>
+            <input type="text" placeholder="AAPL" value={sym} onChange={e => setSym(e.target.value)} style={s.input} />
+          </div>
+          <div>
+            <label style={s.label}>Qty</label>
+            <input type="number" placeholder="100" value={qtyVal} onChange={e => setQtyVal(e.target.value)} style={s.input} />
+          </div>
+          <div>
+            <label style={s.label}>Entry</label>
+            <input type="number" placeholder="0.00" value={entryVal} onChange={e => setEntryVal(e.target.value)} style={s.input} />
+          </div>
+          <div>
+            <label style={s.label}>Exit</label>
+            <input type="number" placeholder="0.00" value={exitVal} onChange={e => setExitVal(e.target.value)} style={s.input} />
+          </div>
         </div>
-        {exit && (
+        {preview && (
           <div style={{ background: t.surface2, borderRadius: 10, padding: "10px 14px", marginBottom: 20, display: "flex", justifyContent: "space-between" }}>
-            <span style={{ fontSize: 13, color: t.textSub }}>Projected P&L</span>
+            <span style={{ fontSize: 13, color: t.textSub }}>Projected P&amp;L</span>
             <span style={{ fontSize: 14, fontWeight: 700, color: previewColor }}>{preview} USDT</span>
           </div>
         )}
         <div style={{ display: "flex", gap: 10 }}>
           <button onClick={onClose} style={{ flex: 1, padding: "11px 0", borderRadius: 12, border: `1px solid ${t.borderInput}`, background: "transparent", color: t.text, fontFamily: FONT, fontSize: 14, fontWeight: 600, cursor: "pointer" }}>Cancel</button>
-          <button onClick={() => onSave(trade.id, { symbol: sym.toUpperCase(), entry: Number(entry), exit: Number(exit), qty: Number(qty), pnl: (Number(exit) - Number(entry)) * Number(qty) })} style={{ flex: 1, padding: "11px 0", borderRadius: 12, border: "none", background: "#0a84ff", color: "#fff", fontFamily: FONT, fontSize: 14, fontWeight: 700, cursor: "pointer" }}>Save Changes</button>
+          <button
+            onClick={() => onSave(trade.id, {
+              symbol: sym.toUpperCase(),
+              entry: Number(entryVal),
+              exit: Number(exitVal),
+              qty: Number(qtyVal),
+              pnl: (Number(exitVal) - Number(entryVal)) * Number(qtyVal),
+            })}
+            style={{ flex: 1, padding: "11px 0", borderRadius: 12, border: "none", background: "#0a84ff", color: "#fff", fontFamily: FONT, fontSize: 14, fontWeight: 700, cursor: "pointer" }}
+          >
+            Save Changes
+          </button>
         </div>
       </div>
     </div>
   )
 }
 
-// ─── Delete Modal ─────────────────────────────────────────────────────────────
-function DeleteModal({ trade, onConfirm, onClose, dark }: { trade: any; onConfirm: (id: string) => void; onClose: () => void; dark: boolean }) {
+function DeleteModal({ trade, onConfirm, onClose, dark }: {
+  trade: any; onConfirm: (id: string) => void; onClose: () => void; dark: boolean
+}) {
   const t = theme(dark)
   const s = makeStyles(t)
   return (
     <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 200 }}>
       <div style={{ ...s.card, width: 380, padding: 28, textAlign: "center" }}>
-        <div style={{ width: 52, height: 52, borderRadius: 16, background: "#ff453a18", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, margin: "0 auto 16px" }}>🗑</div>
         <div style={{ fontSize: 17, fontWeight: 700, color: t.text, letterSpacing: "-0.03em", marginBottom: 8 }}>Delete Trade?</div>
-        <div style={{ fontSize: 14, color: t.textSub, marginBottom: 6 }}>{trade.symbol} · Entry {trade.entry} · Exit {trade.exit}</div>
+        <div style={{ fontSize: 14, color: t.textSub, marginBottom: 6 }}>{trade.symbol} - Entry {trade.entry} - Exit {trade.exit}</div>
         <div style={{ fontSize: 16, fontWeight: 700, color: trade.pnl >= 0 ? "#30d158" : "#ff453a", marginBottom: 24 }}>
           {trade.pnl >= 0 ? "+" : ""}{Number(trade.pnl).toFixed(2)} USDT
         </div>
@@ -166,7 +203,6 @@ function DeleteModal({ trade, onConfirm, onClose, dark }: { trade: any; onConfir
   )
 }
 
-// ─── Main Page ────────────────────────────────────────────────────────────────
 export default function TradesPage() {
   const { dark, toggle, ready } = useDarkMode()
   const t = theme(dark)
@@ -179,7 +215,6 @@ export default function TradesPage() {
   const [message, setMessage] = useState("")
   const [aiLoading, setAiLoading] = useState(false)
   const [coachLoading, setCoachLoading] = useState(false)
-
   const [trades, setTrades] = useState<any[]>([])
   const [chartData, setChartData] = useState<any[]>([])
   const [winLoss, setWinLoss] = useState<any[]>([])
@@ -188,39 +223,44 @@ export default function TradesPage() {
   const [winRate, setWinRate] = useState(0)
   const [totalTrades, setTotalTrades] = useState(0)
   const [avgPnL, setAvgPnL] = useState(0)
-
   const [aiReview, setAiReview] = useState("")
   const [coach, setCoach] = useState("")
-
   const [editTrade, setEditTrade] = useState<any>(null)
   const [deleteTrade, setDeleteTrade] = useState<any>(null)
 
   async function loadTrades() {
     const { data } = await supabase.from("trades").select("*").order("created_at", { ascending: true })
     if (!data) return
-    const clean = data.filter(t => t.symbol)
+    const clean = data.filter((r: any) => r.symbol)
     setTrades(clean)
     let cum = 0
-    setChartData(clean.map((t: any, i: number) => { cum += t.pnl || 0; return { trade: i + 1, pnl: Number(cum.toFixed(2)) } }))
-    const wins = clean.filter((t: any) => t.pnl > 0).length
-    const losses = clean.filter((t: any) => t.pnl <= 0).length
+    setChartData(clean.map((r: any, i: number) => {
+      cum += r.pnl || 0
+      return { trade: i + 1, pnl: Number(cum.toFixed(2)) }
+    }))
+    const wins = clean.filter((r: any) => r.pnl > 0).length
+    const losses = clean.filter((r: any) => r.pnl <= 0).length
     setWinLoss([{ name: "Wins", value: wins }, { name: "Losses", value: losses }])
-    const sum = clean.reduce((s: number, t: any) => s + (t.pnl || 0), 0)
+    const sum = clean.reduce((acc: number, r: any) => acc + (r.pnl || 0), 0)
     setTotalPnL(Number(sum.toFixed(2)))
     setTotalTrades(clean.length)
     setAvgPnL(clean.length ? Number((sum / clean.length).toFixed(2)) : 0)
     setWinRate(clean.length ? Math.round((wins / clean.length) * 100) : 0)
-    const assets: any = {}
-    clean.forEach((t: any) => { assets[t.symbol] = (assets[t.symbol] || 0) + (t.pnl || 0) })
+    const assets: Record<string, number> = {}
+    clean.forEach((r: any) => { assets[r.symbol] = (assets[r.symbol] || 0) + (r.pnl || 0) })
     setAssetStats(Object.keys(assets).map(sym => ({ symbol: sym, pnl: Number(assets[sym].toFixed(2)) })))
   }
 
   async function addTrade() {
     if (!symbol || !entry || !exit || !qty) { setMessage("Please fill all fields"); return }
     const pnl = (Number(exit) - Number(entry)) * Number(qty)
-    const { error } = await supabase.from("trades").insert([{ symbol: symbol.toUpperCase(), entry: Number(entry), exit: Number(exit), qty: Number(qty), pnl }])
-    if (error) { setMessage("Error: " + error.message) } else {
-      setMessage("Trade added ✅")
+    const { error } = await supabase.from("trades").insert([{
+      symbol: symbol.toUpperCase(), entry: Number(entry), exit: Number(exit), qty: Number(qty), pnl,
+    }])
+    if (error) {
+      setMessage("Error: " + error.message)
+    } else {
+      setMessage("Trade added")
       setSymbol(""); setEntry(""); setExit(""); setQty("")
       loadTrades()
       setTimeout(() => setMessage(""), 3000)
@@ -241,7 +281,11 @@ export default function TradesPage() {
 
   async function analyzeTrade(trade: any) {
     setAiLoading(true)
-    const res = await fetch("/api/ai-review", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ trade }) })
+    const res = await fetch("/api/ai-review", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ trade }),
+    })
     const data = await res.json()
     setAiReview(data.review)
     setAiLoading(false)
@@ -249,7 +293,11 @@ export default function TradesPage() {
 
   async function analyzeAllTrades() {
     setCoachLoading(true)
-    const res = await fetch("/api/ai-coach", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ trades }) })
+    const res = await fetch("/api/ai-coach", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ trades }),
+    })
     const data = await res.json()
     setCoach(data.review)
     setCoachLoading(false)
@@ -271,7 +319,6 @@ export default function TradesPage() {
   return (
     <div style={{ minHeight: "100vh", background: t.bg, fontFamily: FONT, transition: "background 0.3s" }}>
 
-      {/* ── Header ── */}
       <header style={{
         background: t.surface, borderBottom: `1px solid ${t.border}`,
         padding: "0 40px", height: 64,
@@ -281,44 +328,34 @@ export default function TradesPage() {
         transition: "background 0.3s, border-color 0.3s",
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <div style={{
-            width: 32, height: 32, borderRadius: 9,
-            background: dark ? "#f5f5f7" : "#1c1c1e",
-            display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16,
-          }}>📈</div>
+          <div style={{ width: 32, height: 32, borderRadius: 9, background: dark ? "#f5f5f7" : "#1c1c1e", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16 }}>📈</div>
           <span style={{ fontSize: 17, fontWeight: 800, color: t.text, letterSpacing: "-0.04em" }}>TradeFlow</span>
           <span style={{ fontSize: 12, color: t.textSub, marginLeft: 4 }}>Trading Journal</span>
         </div>
-
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          {/* dnproduction badge */}
           <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "4px 12px 4px 7px", background: t.surface2, borderRadius: 20, border: `1px solid ${t.border}` }}>
             <div style={{ width: 18, height: 18, borderRadius: 5, background: "linear-gradient(135deg,#1c1c1e,#4a4a4c)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 8, fontWeight: 900, color: "#fff" }}>dn</div>
             <span style={{ fontSize: 11, color: t.textSub, fontWeight: 500 }}>by <span style={{ color: t.text, fontWeight: 700 }}>dnproduction</span></span>
           </div>
-
-          {/* Dark mode toggle */}
-          <button onClick={toggle} title={dark ? "Light mode" : "Dark mode"} style={{
-            width: 36, height: 36, borderRadius: 10,
-            background: t.surface2, border: `1px solid ${t.border}`,
-            cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
-            fontSize: 16, transition: "all 0.2s",
-          }}>{dark ? "☀️" : "🌙"}</button>
-
-          <button onClick={analyzeAllTrades} disabled={coachLoading} style={{
-            padding: "8px 18px", background: coachLoading ? t.surface2 : "#1c1c1e",
-            color: coachLoading ? t.textSub : "#fff",
-            border: `1px solid ${t.border}`, borderRadius: 10, cursor: coachLoading ? "default" : "pointer",
-            fontSize: 13, fontWeight: 600, fontFamily: FONT, transition: "all 0.2s",
-          }}>
-            {coachLoading ? "Analyzing…" : "✦ Analyze All"}
+          <button
+            onClick={toggle}
+            title={dark ? "Light mode" : "Dark mode"}
+            style={{ width: 36, height: 36, borderRadius: 10, background: t.surface2, border: `1px solid ${t.border}`, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, transition: "all 0.2s" }}
+          >
+            {dark ? "☀️" : "🌙"}
+          </button>
+          <button
+            onClick={analyzeAllTrades}
+            disabled={coachLoading}
+            style={{ padding: "8px 18px", background: coachLoading ? t.surface2 : "#1c1c1e", color: coachLoading ? t.textSub : "#fff", border: `1px solid ${t.border}`, borderRadius: 10, cursor: coachLoading ? "default" : "pointer", fontSize: 13, fontWeight: 600, fontFamily: FONT, transition: "all 0.2s" }}
+          >
+            {coachLoading ? "Analyzing..." : "Analyze All"}
           </button>
         </div>
       </header>
 
       <div style={{ maxWidth: 1100, margin: "0 auto", padding: "36px 40px" }}>
 
-        {/* ── Stat cards ── */}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 16, marginBottom: 28 }}>
           {statCards.map(sc => (
             <div key={sc.label} style={{ ...s.card, padding: "20px 22px" }}>
@@ -328,10 +365,7 @@ export default function TradesPage() {
           ))}
         </div>
 
-        {/* ── Charts row ── */}
         <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", gap: 16, marginBottom: 28 }}>
-
-          {/* Profit Curve */}
           <div style={s.card}>
             <div style={s.sectionTitle}>Profit Curve</div>
             <ResponsiveContainer width="100%" height={180}>
@@ -344,7 +378,6 @@ export default function TradesPage() {
             </ResponsiveContainer>
           </div>
 
-          {/* Win / Loss */}
           <div style={s.card}>
             <div style={s.sectionTitle}>Win / Loss</div>
             <ResponsiveContainer width="100%" height={180}>
@@ -357,58 +390,53 @@ export default function TradesPage() {
             </ResponsiveContainer>
           </div>
 
-          {/* P&L by Asset */}
           <div style={s.card}>
-            <div style={s.sectionTitle}>P&L by Asset</div>
+            <div style={s.sectionTitle}>P&amp;L by Asset</div>
             <ResponsiveContainer width="100%" height={180}>
               <BarChart data={assetStats} barSize={28}>
                 <XAxis dataKey="symbol" tick={{ fontSize: 11, fill: t.textSub }} axisLine={false} tickLine={false} />
                 <YAxis tick={{ fontSize: 11, fill: t.textSub }} axisLine={false} tickLine={false} width={42} />
                 <Tooltip contentStyle={{ background: t.tooltipBg, border: `1px solid ${t.border}`, borderRadius: 10, fontFamily: FONT }} />
                 <Bar dataKey="pnl" radius={[6, 6, 0, 0]}>
-                  {assetStats.map((entry, i) => <Cell key={i} fill={entry.pnl >= 0 ? "#30d158" : "#ff453a"} />)}
+                  {assetStats.map((row, i) => <Cell key={i} fill={row.pnl >= 0 ? "#30d158" : "#ff453a"} />)}
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
           </div>
         </div>
 
-        {/* ── Add Trade ── */}
         <div style={{ ...s.card, marginBottom: 28 }}>
           <div style={s.sectionTitle}>Add Trade</div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 14, marginBottom: 16 }}>
-            {[
-              ["Symbol", symbol, setSymbol, "text", "AAPL"],
-              ["Entry Price", entry, setEntry, "number", "0.00"],
-              ["Exit Price", exit, setExit, "number", "0.00"],
-              ["Quantity", qty, setQty, "number", "100"],
-            ].map(([lbl, val, set, type, ph]) => (
-              <div key={lbl as string}>
-                <label style={s.label}>{lbl as string}</label>
-                <input
-                  type={type as string} placeholder={ph as string}
-                  value={val as string} onChange={e => (set as any)(e.target.value)}
-                  onKeyDown={e => e.key === "Enter" && addTrade()}
-                  style={s.input}
-                />
-              </div>
-            ))}
+            <div>
+              <label style={s.label}>Symbol</label>
+              <input type="text" placeholder="AAPL" value={symbol} onChange={e => setSymbol(e.target.value)} onKeyDown={e => e.key === "Enter" && addTrade()} style={s.input} />
+            </div>
+            <div>
+              <label style={s.label}>Entry Price</label>
+              <input type="number" placeholder="0.00" value={entry} onChange={e => setEntry(e.target.value)} onKeyDown={e => e.key === "Enter" && addTrade()} style={s.input} />
+            </div>
+            <div>
+              <label style={s.label}>Exit Price</label>
+              <input type="number" placeholder="0.00" value={exit} onChange={e => setExit(e.target.value)} onKeyDown={e => e.key === "Enter" && addTrade()} style={s.input} />
+            </div>
+            <div>
+              <label style={s.label}>Quantity</label>
+              <input type="number" placeholder="100" value={qty} onChange={e => setQty(e.target.value)} onKeyDown={e => e.key === "Enter" && addTrade()} style={s.input} />
+            </div>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-            <button onClick={addTrade} style={{
-              padding: "10px 28px", background: "#1c1c1e", color: "#fff",
-              border: "none", borderRadius: 12, cursor: "pointer",
-              fontSize: 14, fontWeight: 700, fontFamily: FONT,
-            }}>Save Trade</button>
+            <button onClick={addTrade} style={{ padding: "10px 28px", background: "#1c1c1e", color: "#fff", border: "none", borderRadius: 12, cursor: "pointer", fontSize: 14, fontWeight: 700, fontFamily: FONT }}>
+              Save Trade
+            </button>
             {message && (
-              <span style={{ fontSize: 13, color: message.includes("✅") ? "#30d158" : "#ff453a", fontWeight: 600 }}>
+              <span style={{ fontSize: 13, color: message.includes("added") ? "#30d158" : "#ff453a", fontWeight: 600 }}>
                 {message}
               </span>
             )}
           </div>
         </div>
 
-        {/* ── Trade History ── */}
         <div style={{ ...s.card, marginBottom: 28 }}>
           <div style={s.sectionTitle}>Trade History</div>
           <div style={{ overflowX: "auto" }}>
@@ -425,57 +453,61 @@ export default function TradesPage() {
                   <tr key={trade.id} style={{ background: i % 2 === 0 ? "transparent" : `${t.surface2}60` }}>
                     <td style={{ padding: "11px 12px", fontWeight: 700, color: t.text }}>{trade.symbol}</td>
                     <td style={{ padding: "11px 12px", color: t.textSub, fontVariantNumeric: "tabular-nums" }}>{trade.entry}</td>
-                    <td style={{ padding: "11px 12px", color: t.textSub, fontVariantNumeric: "tabular-nums" }}>{trade.exit ?? "—"}</td>
+                    <td style={{ padding: "11px 12px", color: t.textSub, fontVariantNumeric: "tabular-nums" }}>{trade.exit ?? "-"}</td>
                     <td style={{ padding: "11px 12px", color: t.textSub, fontVariantNumeric: "tabular-nums" }}>{trade.qty}</td>
                     <td style={{ padding: "11px 12px", fontWeight: 700, fontVariantNumeric: "tabular-nums", color: trade.pnl >= 0 ? "#30d158" : "#ff453a" }}>
                       {trade.pnl >= 0 ? "+" : ""}{Number(trade.pnl).toFixed(2)}
                     </td>
-                    <td style={{ padding: "11px 12px", maxWidth: 260 }}>
-                      <button onClick={() => analyzeTrade(trade)} disabled={aiLoading} style={{
-                        padding: "5px 12px", background: t.surface2, color: t.text,
-                        border: `1px solid ${t.border}`, borderRadius: 8,
-                        cursor: "pointer", fontSize: 12, fontFamily: FONT,
-                      }}>
-                        {aiLoading ? "…" : "Analyze ✦"}
+                    <td style={{ padding: "11px 12px" }}>
+                      <button onClick={() => analyzeTrade(trade)} disabled={aiLoading} style={{ padding: "5px 12px", background: t.surface2, color: t.text, border: `1px solid ${t.border}`, borderRadius: 8, cursor: "pointer", fontSize: 12, fontFamily: FONT }}>
+                        {aiLoading ? "..." : "Analyze"}
                       </button>
                     </td>
                     <td style={{ padding: "11px 12px" }}>
                       <div style={{ display: "flex", gap: 4 }}>
                         <IconBtn icon="✎" color="#0a84ff" onClick={() => setEditTrade(trade)} title="Edit" />
-                        <IconBtn icon="✕" color="#ff453a" onClick={() => setDeleteTrade(trade)} title="Delete" />
+                        <IconBtn icon="x" color="#ff453a" onClick={() => setDeleteTrade(trade)} title="Delete" />
                       </div>
                     </td>
                   </tr>
                 ))}
                 {trades.length === 0 && (
-                  <tr><td colSpan={7} style={{ padding: "32px 12px", textAlign: "center", color: t.textSub, fontSize: 14 }}>No trades yet. Add your first trade above.</td></tr>
+                  <tr>
+                    <td colSpan={7} style={{ padding: "32px 12px", textAlign: "center", color: t.textSub, fontSize: 14 }}>
+                      No trades yet. Add your first trade above.
+                    </td>
+                  </tr>
                 )}
               </tbody>
             </table>
           </div>
         </div>
 
-        {/* ── AI Panels ── */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 28 }}>
-          {[
-            { title: "AI Trade Review", content: aiReview, empty: "Click 'Analyze ✦' on any trade to get a per-trade breakdown." },
-            { title: "AI Trading Coach", content: coach, empty: "Click '✦ Analyze All' in the header to get coaching on your full journal." },
-          ].map(panel => (
-            <div key={panel.title} style={s.card}>
-              <div style={{ ...s.sectionTitle, display: "flex", alignItems: "center", gap: 8 }}>
-                <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#0a84ff", display: "inline-block" }} />
-                {panel.title}
-              </div>
-              {panel.content ? (
-                <pre style={{ whiteSpace: "pre-wrap", lineHeight: 1.7, fontSize: 13, color: t.text, margin: 0, fontFamily: FONT }}>{panel.content}</pre>
-              ) : (
-                <div style={{ fontSize: 13, color: t.textSub, lineHeight: 1.6 }}>{panel.empty}</div>
-              )}
+          <div style={s.card}>
+            <div style={{ ...s.sectionTitle, display: "flex", alignItems: "center", gap: 8 }}>
+              <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#0a84ff", display: "inline-block" }} />
+              AI Trade Review
             </div>
-          ))}
+            {aiReview ? (
+              <pre style={{ whiteSpace: "pre-wrap", lineHeight: 1.7, fontSize: 13, color: t.text, margin: 0, fontFamily: FONT }}>{aiReview}</pre>
+            ) : (
+              <div style={{ fontSize: 13, color: t.textSub, lineHeight: 1.6 }}>Click Analyze on any trade to get a per-trade breakdown.</div>
+            )}
+          </div>
+          <div style={s.card}>
+            <div style={{ ...s.sectionTitle, display: "flex", alignItems: "center", gap: 8 }}>
+              <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#0a84ff", display: "inline-block" }} />
+              AI Trading Coach
+            </div>
+            {coach ? (
+              <pre style={{ whiteSpace: "pre-wrap", lineHeight: 1.7, fontSize: 13, color: t.text, margin: 0, fontFamily: FONT }}>{coach}</pre>
+            ) : (
+              <div style={{ fontSize: 13, color: t.textSub, lineHeight: 1.6 }}>Click Analyze All in the header to get coaching on your full journal.</div>
+            )}
+          </div>
         </div>
 
-        {/* Footer */}
         <div style={{ textAlign: "center", paddingTop: 12, paddingBottom: 8, borderTop: `1px solid ${t.border}` }}>
           <div style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
             <div style={{ width: 18, height: 18, borderRadius: 5, background: "linear-gradient(135deg,#1c1c1e,#4a4a4c)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 8, fontWeight: 900, color: "#fff" }}>dn</div>
@@ -485,8 +517,7 @@ export default function TradesPage() {
 
       </div>
 
-      {/* Modals */}
-      {editTrade   && <EditModal   trade={editTrade}   onSave={updateTrade}  onClose={() => setEditTrade(null)}   dark={dark} />}
+      {editTrade && <EditModal trade={editTrade} onSave={updateTrade} onClose={() => setEditTrade(null)} dark={dark} />}
       {deleteTrade && <DeleteModal trade={deleteTrade} onConfirm={deleteTradeFn} onClose={() => setDeleteTrade(null)} dark={dark} />}
 
     </div>
